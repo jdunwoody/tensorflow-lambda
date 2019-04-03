@@ -1,0 +1,47 @@
+service: myService
+
+provider:
+  name: aws
+  runtime: python3.6
+  region: ap-southeast-2
+  memorySize: 1536
+  timeout: 30
+
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - lambda:InvokeFunction
+        - lambda:InvokeAsyn
+        - logs:CreateLogGroup
+        - logs:CreateLogStream
+        - logs:PutLogEvents
+      Resource: "*"
+
+package:
+  include:
+    - handler.py
+    - data/model.h5
+    - lib/**
+  exclude:
+    - ./**
+    - ./**/__pycache__
+    
+functions:
+  prediction:
+    handler: handler.endpoint
+    description: My Service uses TensorFlow on Lambda to make predictions.
+    environmentVariables:
+      LIBRARY_LIB_DIR: lib
+ 
+    tags:
+      owner: My Name
+      project: MyService
+
+plugins:
+  - serverless-python-requirements
+
+custom:
+  pythonRequirements:
+    dockerizePip: non-linux
+    zip: true
+    slim: true
