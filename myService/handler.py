@@ -6,12 +6,14 @@ except ImportError:
 
 from keras.models import load_model
 import pandas as pd
+import json
 
 
 def endpoint(event: dict, context):
     try:
         model = load_model("./data/model.h5")
-        result_raw = model.predict(feature_values)
+        input = []
+        result_raw = model.predict(input)
         result = pd.DataFrame(result_raw)
 
         #         result.columns = ['home_team_score', 'away_team_score']
@@ -25,8 +27,7 @@ def endpoint(event: dict, context):
             'statusCode': 200,
             'body': json.dumps(body)
         }
-
-    except InputValidationError as e:
+    except Exception as e:
         response = {
             'statusCode': 400,
             'body': json.dumps(str(e))
